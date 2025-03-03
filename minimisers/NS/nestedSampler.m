@@ -78,6 +78,11 @@ if mod(nLive, 1) ~= 0 || nLive < 0
     coderException(coderEnums.errorCodes.domainError, 'NS Error: nLive must be an integer >= 0')
 end
 
+% check total number of points is large enough if using MultiNest
+if nMCMC == 0 && nLive < D+1
+    coderException(coderEnums.errorCodes.domainError, 'NS Error: The number of live points must be larger than the number of fit parameters for MultiNest.'); 
+end
+
 % draw the set of initial live points from the unit hypercube
 % (they will be rescaled below)
 livepoints = rand(nLive, D);
