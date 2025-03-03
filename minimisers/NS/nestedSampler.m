@@ -208,8 +208,12 @@ while tol > tolerance || j <= nLive
             % calculate optimal ellipsoids        
             [Bs, mus, VEs, ns] = optimalEllipsoids(livepoints, VS);
             K = length(VEs); % number of ellipsoids (subclusters)
+        end
 
-        else
+        if FS < h || isempty(VEs)  % sometimes FS is unassigned? see
+            if isempty(VEs)
+                VEs = VEstmp; % revert to previous VEs value
+            end
             % simply rescale the bounding ellipsoids
             for k=1:K
                 scalefac = max([1 (exp(-(j+1)/nLive)*ns(k)/nLive)/VEs(k)]);
@@ -219,10 +223,9 @@ while tol > tolerance || j <= nLive
                     Bs((k-1)*D+1:k*D,:) = Bs((k-1)*D+1:k*D,:)*scalefac^(2/D);
                     VEs(k) = scalefac*VEs(k);
                 end
-           end
-
+            end
         end
-
+        VEstmp = VEs;
 
         % calculate ratio of volumes (FS>=1) and cumulative fractional volume
         Vtot = sum(VEs);
