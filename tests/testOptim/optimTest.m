@@ -1,9 +1,9 @@
 % Test a simple example using simulated data.
 % The 'data' in this example is actually simulation data using true values:
-% Layer |  Thickness | SLD  | Roughness 
+% Layer |  Thickness | SLD  | Roughness
 % ------|------------|------|-----------
-%   1   |     60     | 4e-6 |     6     
-%   2   |     150    | 1e-6 |     8     
+%   1   |     60     | 4e-6 |     6
+%   2   |     150    | 1e-6 |     8
 %
 
 function results = runtest()
@@ -30,20 +30,20 @@ if perturb
 end
 
 paramGroup = {
-               {'Layer 1 Thickness', 40, param_values(1, 1), 80, true, 'gaussian', 60, 60*max_ptb};
-               {'Layer 1 SLD', 3e-6, param_values(1, 2), 5e-6, true, 'uniform', 0, Inf};
-               {'Layer 1 Roughness', 1, param_values(1, 3), 5, true, 'uniform', 0, Inf};
-               {'Layer 2 Thickness', 100, param_values(2, 1), 200, true, 'gaussian', 150, 150*max_ptb};
-               {'Layer 2 SLD', 5e-7, param_values(2, 2), 1.5e-6, true, 'uniform', 0, Inf};
-               {'Layer 2 Roughness', 6, param_values(2, 3), 10, true, 'uniform', 0, Inf};
-             };
+    {'Layer 1 Thickness', 40, param_values(1, 1), 80, true, 'gaussian', 60, 60*max_ptb};
+    {'Layer 1 SLD', 3e-6, param_values(1, 2), 5e-6, true, 'uniform', 0, Inf};
+    {'Layer 1 Roughness', 1, param_values(1, 3), 5, true, 'uniform', 0, Inf};
+    {'Layer 2 Thickness', 100, param_values(2, 1), 200, true, 'gaussian', 150, 150*max_ptb};
+    {'Layer 2 SLD', 5e-7, param_values(2, 2), 1.5e-6, true, 'uniform', 0, Inf};
+    {'Layer 2 Roughness', 6, param_values(2, 3), 10, true, 'uniform', 0, Inf};
+    };
 
 problem.addParameterGroup(paramGroup);
 
 layers = {
     {'Layer 1', 'Layer 1 Thickness', 'Layer 1 SLD', 'Layer 1 Roughness'};
     {'Layer 2', 'Layer 2 Thickness', 'Layer 2 SLD', 'Layer 2 Roughness'};
-};
+    };
 
 problem.addLayerGroup(layers);
 
@@ -57,7 +57,7 @@ problem.addContrast( ...
     'BulkIn',       'SLD Air',...
     'BulkOut',      'SLD D2O',...
     'background',   'Background 1',...
-    'resolution',   'Resolution 1',... 
+    'resolution',   'Resolution 1',...
     'scalefactor',  'Scalefactor 1',...
     'data',         'dataset',...
     'model',        stack);
@@ -69,10 +69,12 @@ problem.setScalefactor(1, "value", 1);
 procedures = ["calculate", "simplex", "de", "ns", "dream"];
 results = zeros(1, 5);
 parfor i=1:5
-controls = controlsClass();
-controls.procedure = procedures(i);
-[~, r] = RAT(problem, controls);
-results(i) = r.calculationResults.sumChi;
+    controls = controlsClass();
+    controls.procedure = procedures(i);
+    controls.display = "off";
+
+    [~, r] = RAT(problem, controls);
+    results(i) = r.calculationResults.sumChi;
 end
 end
 
@@ -80,3 +82,5 @@ chis = zeros(10, 5);
 for repeat=1:10
     chis(repeat, :) = runtest();
 end
+
+chis = array2table(chis, 'VariableNames', ["calculate", "simplex", "de", "ns", "dream"]);
