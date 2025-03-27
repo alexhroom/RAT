@@ -54,19 +54,25 @@ for points = 1:length(q)
         denom_n = kn + knp1;
         sigmasqrd = layersSigma(n + 1)^2;
         err_n = exp(-2 * kn * knp1 * sigmasqrd);
-        r_n_np1 = (nom_n / denom_n) * err_n;
+        r_n = (nom_n / denom_n) * err_n;
 
         % Find the Phase Factor = (k_n * d_n)
         beta = kn * layersThick(n) * ci;
 
         % Create the M_n matrix: */
-        M_n(1,1) = exp(beta);
-        M_n(1,2) = r_n_np1 * exp(beta);
-        M_n(2,1) = r_n_np1 * exp(-beta);
-        M_n(2,2) = exp(-beta);
-
-        % Multiply the matrices
-        M_res = M_tot * M_n;
+        % Multiply system transfer matrix by the layer transfer matrix
+        % Coder behaves better if you just do it manually
+        % rather than M_res = M_tot * M_n;
+        % we'll denote the entries M_res = [a b; c d]
+        exp_beta = exp(beta);
+        inv_exp_beta = 1/exp_beta;
+        a_exp_beta = M_res(1,1)*exp_beta;
+        b_inv_exp_beta = M_res(1,2)*inv_exp_beta;
+        c_exp_beta = M_res(2, 1)*exp_beta;
+        d_inv_exp_beta = M_res(2,2)*inv_exp_beta;
+ 
+        M_res = [a_exp_beta + r_n*b_inv_exp_beta r_n*a_exp_beta + b_inv_exp_beta;
+                 c_exp_beta + r_n*d_inv_exp_beta r_n*c_exp_beta + d_inv_exp_beta];
 
         % Reassign the values back to M_tot:
         M_tot = M_res;
